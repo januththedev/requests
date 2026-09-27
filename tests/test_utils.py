@@ -881,6 +881,13 @@ def test_should_bypass_proxies_no_proxy_domain_boundary(url, expected):
         ("http://google.com:5000/v1.0/", False, None),
         ("http://mylocalhostname:5000/v1.0/", True, "<local>"),
         ("http://192.168.0.1/", False, ""),
+        # A ProxyOverride entry must not match a host that merely starts with
+        # it: "example.com" is not a prefix rule for "example.com.evil.net".
+        ("http://example.com.evil.net/", False, "example.com"),
+        ("http://notexample.com/", False, "example.com"),
+        # Wildcards must still work, and stay anchored at the end too.
+        ("http://www.example.com/", True, "*.example.com"),
+        ("http://www.example.com.evil.net/", False, "*.example.com"),
     ),
 )
 def test_should_bypass_proxies_win_registry(url, expected, override, monkeypatch):

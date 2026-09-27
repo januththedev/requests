@@ -130,7 +130,9 @@ if sys.platform == "win32":
             test = test.replace(".", r"\.")  # mask dots
             test = test.replace("*", r".*")  # change glob sequence
             test = test.replace("?", r".")  # change glob char
-            if re.match(test, host, re.I):
+            # The whole host must match. re.match only anchors the start, so
+            # "example.com" would also bypass the proxy for "example.com.evil.net".
+            if re.fullmatch(test, host, re.I):
                 return True
         return False
 
